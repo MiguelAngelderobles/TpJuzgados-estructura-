@@ -7,19 +7,15 @@ class Fuero(Enum):
     familiar = 4
     comercial = 5
 
+class Prioridad(Enum):
+    normal = 1
+    urgente = 2
 
 class Expediente:
-    def __init__(self,nroExpediente = 0,fuero = Fuero.civil,prioridad=0,estado=0):
+    def __init__(self,nroExpediente = 0,fuero = Fuero.civil,prioridad = Prioridad.normal,estado=0):
         self.nroExpediente = nroExpediente
         self.fuero = fuero
-
-
-        if prioridad == 1:
-            self.prioridad = 'normal'
-        elif prioridad == 2:
-            self.prioridad = 'urgente'
-        else:
-            raise Exception('opcion incorrecta')
+        self.prioridad = prioridad
 
         if estado == 1:
             self.estado = 'Investigacion'
@@ -27,109 +23,89 @@ class Expediente:
             self.estado = 'en juicio'
 
 
+    def getPrioridad(self):
+        return self.prioridad
+
+    def getFuero(self):
+        return self.fuero
+
+    def esNomal(self):
+        return True
+
+    def esUrgente():
+        return True
     def __repr__(self):
-        cadena = 'nro Expediente: ' + str(self.nroExpediente) + '\nfuero de la causa: '+ str(self.fuero.name) + '\nprioridad: ' +  str(self.prioridad) +'\nestado de la causa: ' + str(self.estado)
+        cadena = 'nro Expediente: ' + str(self.nroExpediente) + '\nfuero de la causa: '+ str(self.fuero.name) + '\nprioridad: ' +  str(self.prioridad.name) +'\nestado de la causa: ' + str(self.estado)
         return cadena
 
-class ExpedienteNormal:
+class ColaExpediente:
     def __init__(self):
-        self.expedienteNormal
+        self.colaExpediente
     def __init__(self):
-        self.expedienteNormal = []
+        self.colaExpediente = []
 
-  def empty(self):
-    self.expedienteNormal.clear()
+    def empty(self):
+      self.colaExpediente.clear()
 
-  def queue(self,item):
-    self.expedienteNormal.insert(0,item)
+    def queue(self,item):
+      self.colaExpediente.insert(0,item)
 
-  def dequeue(self):
-    data = None
-    if not self.isEmpty():
-      data = self.expedienteNormal.pop()
-    else:
-      raise Exception('queue isEmpty')
-    return data
+    def dequeue(self):
+      data = None
+      if not self.isEmpty():
+        data = self.colaExpediente.pop()
+      else:
+        raise Exception('queue isEmpty')
+        return data
 
-  def top(self):
-    data = None
-    if not self.isEmpty():
-      data = self.expedienteNormal[len(self.expedienteNormal)-1]
-    else:
-      raise Exception('queque isEmpy')
-    return data
+    def top(self):
+      data = None
+      if not self.isEmpty():
+        data = self.colaExpediente[len(self.colaExpediente)-1]
+      else:
+        raise Exception('queque isEmpy')
+        return data
 
-  def clonar(self):
-    clon = Queue()
-    for item in reversed(self.expedienteNormal):
-      clon.queue(item)
-    return clon
+    def clonar(self):
+      clon = Queue()
+      for item in reversed(self.colaExpediente):
+          clon.queue(item)
+      return clon
 
-  def lenQueue(self):
-    return len(self.expedienteNormal)
+    def lenQueue(self):
+      return len(self.colaExpediente)
 
-  def isEmpty(self):
-    return len(self.expedienteNormal) == 0
+    def isEmpty(self):
+      return len(self.colaExpediente) == 0
 
-  def __repr__(self):
-    return str(self.expedienteNormal)
-
-
-
-
-class ExpedienteUrgente:
-    def __init__(self):
-        self.expedienUrgente
-
-    def __init__(self):
-        self.expedienUrgente = []
-
-  def empty(self):
-    self.expedienUrgente.clear()
-
-  def queue(self,item):
-    self.expedienUrgente.insert(0,item)
-
-  def dequeue(self):
-    data = None
-    if not self.isEmpty():
-      data = self.expedienUrgente.pop()
-    else:
-      raise Exception('queue isEmpty')
-    return data
-
-  def top(self):
-    data = None
-    if not self.isEmpty():
-      data = self.expedienUrgente[len(self.expedienUrgente)-1]
-    else:
-      raise Exception('queque isEmpy')
-    return data
-
-  def clonar(self):
-    clon = Queue()
-    for item in reversed(self.expedienUrgente):
-      clon.queue(item)
-    return clon
-
-  def lenQueue(self):
-    return len(self.expedienUrgente)
-
-  def isEmpty(self):
-    return len(self.expedienUrgente) == 0
-
-  def __repr__(self):
-    return str(self.expedienUrgente)
-
+    def __repr__(self):
+      return str(self.colaExpediente)
 
 class Juzgado:
-    def __init__(self,nombre,normarl,urgente):
+    normal = ColaExpediente()
+    urgente = ColaExpediente()
+
+    def __init__(self,nombre):
         self.nombre = nombre
-        self.normal = normal
-        self.urgente = urgente
+        urgente = ColaExpediente()
+        normal = ColaExpediente()
+
+    def __repr__(self):
+        cadena = 'nombre del juzgado: '+ self.nombre + '\n' + 'expedientes prioridad normal: '+str(self.normal) + '\n'+ 'expedientes prioridad urgente: '+str(self.urgente)
+        return cadena
+
+    def recibirExpediente(self,expediente):
+        if expediente.getPrioridad() == Prioridad.normal:
+            self.normal.queue(expediente)
+        else:
+            self.urgente.queue(expediente)
 
 
 
-expediente = Expediente(125,Fuero.civil,1,1)
 
-print(expediente)
+expediente = Expediente(125,Fuero.civil,Prioridad.urgente,1)
+juzgado = Juzgado('lopez')
+juzgado.recibirExpediente(expediente)
+for i in range(10):
+    juzgado.recibirExpediente(expediente)
+print(juzgado)
